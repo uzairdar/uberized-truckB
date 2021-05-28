@@ -1,6 +1,14 @@
 const router = require("express").Router();
 let User = require("../models/User.model");
 var nodemailer = require("nodemailer");
+const multerS3 = require("multer-s3");
+const cloudinary = require("cloudinary").v2;
+
+cloudinary.config({
+  cloud_name: "dqxbemx5c",
+  api_key: "788451982548334",
+  api_secret: "zP1s17Kmi-iY8XEeFRfBPwoTGu8",
+});
 
 router.route("/").get((req, res) => {
   User.find()
@@ -13,10 +21,38 @@ router.route("/").get((req, res) => {
 });
 router.route("/check-email/:email").post((req, res) => {
   const { email } = req.params;
+  var random = Math.floor(Math.random() * (9999 - 1000) + 1000);
+  console.log("check email");
   User.findOne({ email })
     .then((users) => {
       if (users) {
-        return res.json({ message: "User exists", users, found: true });
+        var transporter = nodemailer.createTransport({
+          service: "gmail",
+          auth: {
+            user: "uzairdar01@gmail.com",
+            pass: "D@r12345",
+          },
+        });
+        var mailOptions = {
+          from: "uzairdar01@gmail.com",
+          to: email,
+          subject: "Uberized Truck pin",
+          text: "Pin is: " + random,
+        };
+
+        transporter.sendMail(mailOptions, function (error, info) {
+          if (error) {
+            console.log(error);
+          } else {
+            console.log("Email sent: " + info.response);
+          }
+        });
+        return res.json({
+          message: "User exists",
+          users,
+          pin: random,
+          found: true,
+        });
       } else {
         return res.json({ message: "User doesnot exist", found: false });
       }
@@ -39,7 +75,8 @@ router.route("/remove/:uid").delete((req, res) => {
 
 router.route("/createaccount").post((req, res) => {
   console.log("data", req.body);
-  const { email, firstname, lastname, address, mobile, position } = req.body;
+  const { email, firstname, lastname, address, country, mobile, position } =
+    req.body;
   const isVerified = false;
   var random = Math.floor(Math.random() * (9999 - 1000) + 1000);
 
@@ -49,6 +86,7 @@ router.route("/createaccount").post((req, res) => {
     email,
     isVerified,
     address,
+    country,
     mobile,
     position,
   });
@@ -92,7 +130,9 @@ router.route("/createaccount").post((req, res) => {
       }
     });
 });
+
 router.route("/confirmemail/:uid").get((req, res) => {
+  console.log("hell o");
   const { uid } = req.params;
   const isVerified = true;
   User.findByIdAndUpdate(uid, {
@@ -144,6 +184,36 @@ router.route("/login").post((req, res) => {
     })
     .catch((error) => {
       res.status(400).json({ error });
+    });
+});
+
+router.route("/update-profile-image/:uid").post((req, res) => {
+  const { uid } = req.params;
+  const { data } = req.body;
+
+  console.log("data", uid, data, req.body.udata);
+  User.findByIdAndUpdate(
+    uid,
+    {
+      image: data,
+    },
+    { new: true }
+  )
+    .then((user) => {
+      if (user) {
+        return res.json({
+          user,
+          message: "image updated successfully",
+        });
+      } else {
+        return res.json({
+          udata,
+          message: "image not updated",
+        });
+      }
+    })
+    .catch((error) => {
+      return res.json({ error });
     });
 });
 module.exports = router;

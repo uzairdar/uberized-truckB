@@ -2,38 +2,33 @@ const mongoose = require("mongoose");
 
 const Schema = mongoose.Schema;
 
-const userSchema = new Schema(
+const vehicleSchema = new Schema(
   {
-    firstname: {
+    service: {
       type: String,
       required: true,
     },
-    lastname: {
+    brand: {
       type: String,
       required: true,
     },
-    email: {
-      type: String,
-      required: true,
-      unique: true,
-    },
-
-    isVerified: {
-      type: Boolean,
-    },
-    mobile: {
-      type: Number,
-      required: true,
-    },
-    position: {
+    model: {
       type: String,
       required: true,
     },
-    country: {
+    manufacturer: {
       type: String,
       required: true,
     },
-    address: {
+    number: {
+      type: String,
+      required: true,
+    },
+    color: {
+      type: String,
+      required: true,
+    },
+    userId: {
       type: String,
       required: true,
     },
@@ -46,5 +41,5 @@ const userSchema = new Schema(
   }
 );
 
-const User = mongoose.model("User", userSchema);
-module.exports = User;
+const Vehicle = mongoose.model("Vehicle", vehicleSchema);
+module.exports = Vehicle;
