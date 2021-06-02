@@ -1,5 +1,5 @@
 const router = require("express").Router();
-let Vehicle = require("../models/Vehicle.model");
+let Vehicle = require("../models/Vehicles.model");
 router.route("/").get((req, res) => {
   Vehicle.find()
     .then((users) => {
@@ -10,7 +10,7 @@ router.route("/").get((req, res) => {
     });
 });
 router.route("/add-vehicle").post((req, res) => {
-  const { service, brand, model, manufacturer, number, color, userId } =
+  const { service, brand, image, model, manufacturer, number, color, userId } =
     req.body;
   console.log(
     "service",
@@ -28,9 +28,11 @@ router.route("/add-vehicle").post((req, res) => {
     model,
     manufacturer,
     number,
+    image,
     color,
     userId,
   });
+  console.log("new vehicle", newVehicle);
   newVehicle
     .save()
     .then((vehicle) => {
@@ -43,7 +45,7 @@ router.route("/add-vehicle").post((req, res) => {
       }
     })
     .catch((error) => {
-      console.log("error");
+      console.log("error", error);
       res.json({ message: "Vehicle not added", error: error });
     });
 });
