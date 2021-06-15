@@ -72,7 +72,50 @@ router.route("/remove/:uid").delete((req, res) => {
       return res.json({ error });
     });
 });
+router.route("/update-user/:uid").post((req, res) => {
+  const { uid } = req.params;
+  const {
+    email,
+    firstname,
+    lastname,
+    address,
+    country,
+    mobile,
+    position,
+    isVerified,
+  } = req.body;
 
+  // console.log("data", uid, data, req.body.udata);
+  User.findByIdAndUpdate(
+    uid,
+    {
+      email,
+      firstname,
+      lastname,
+      address,
+      isVerified,
+      country,
+      mobile,
+      position,
+    },
+    { new: true }
+  )
+    .then((user) => {
+      if (user) {
+        return res.json({
+          user,
+          message: "user updated successfully",
+        });
+      } else {
+        return res.json({
+          message: "user not updated",
+        });
+      }
+    })
+    .catch((error) => {
+      return res.json({ error });
+    });
+});
 router.route("/createaccount").post((req, res) => {
   console.log("data", req.body);
   const { email, firstname, lastname, address, country, mobile, position } =
@@ -190,8 +233,7 @@ router.route("/login").post((req, res) => {
 router.route("/update-profile-image/:uid").post((req, res) => {
   const { uid } = req.params;
   const { data } = req.body;
-
-  console.log("data", uid, data, req.body.udata);
+  // console.log("data", uid, data, req.body.udata);
   User.findByIdAndUpdate(
     uid,
     {

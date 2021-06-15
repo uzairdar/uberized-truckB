@@ -26,18 +26,24 @@ app.use(cors());
 app.use(express.json());
 const userRouter = require("./routes/User");
 const vehicleRouter = require("./routes/Vehicle");
+const adminRouter = require("./routes/Admin");
+const rideRouter = require("./routes/Rides");
 app.use("/api/vehicle", vehicleRouter);
 app.use("/api/user", userRouter);
+app.use("/api/admin", adminRouter);
+app.use("/api/ride", rideRouter);
 const server = http.createServer(app);
 const io = require("./socket.js");
 io.connect(server);
-
+let count = [];
+let rides = [];
 io.on("connection", (socket) => {
   console.log("a user connected");
   socket.on("storeClientInfo", function (data) {
     var clientInfo = new Object();
-    clientInfo.userId = data.userId;
-    clientInfo.clientId = socket.id;
+    console.log("dataa", data);
+    clientInfo.user = data.user;
+    clientInfo.clientSocket = socket;
     // let userAlreadyExists = false;
 
     // for (let i = 0; i < clients.length; i++) {
@@ -46,8 +52,10 @@ io.on("connection", (socket) => {
     //     break;
     //   }
     // }
-    let userAlreadyExists = clients.find((c) => {
-      if (c.userId === data.userId) {
+    let userAlreadyExists = clients.find((c, index) => {
+      console.log("index ", index);
+      if (c.user._id === data?.user._id) {
+        count.push(index);
         return true;
       } else {
         return false;
@@ -56,11 +64,70 @@ io.on("connection", (socket) => {
     console.log("User exists then true ", userAlreadyExists);
     if (!userAlreadyExists) {
       clients.push(clientInfo);
+    } else {
+      console.log("updated");
+      clients[count[0]] = clientInfo;
     }
     console.log("It starts here ", clients, "THis is our cients array");
   });
   socket.on("setLocationData", function (data) {
-    console.log("locationData", data);
+    rides.push(data);
+
+    console.log("clients", clients);
+    clients.map((single) => {
+      // console.log("single", single);
+      if (single.user.position === "driver") {
+        single.clientSocket.emit("locationRequest", data);
+      }
+    });
+  });
+  socket.on("currentLocation", function (data) {
+    console.log("current location", data);
+  });
+  socket.on("acceptRequest", function (data) {
+    let check = false;
+    console.log("id is ", data);
+    rides.map((single, index) => {
+      // console.log("single", single);
+      if (single.id === data.details.id && !single.accepted) {
+        rides[index].accepted = true;
+        for (let i = 0; i < clients.length; i++) {
+          if (
+            clients[i]?.user._id === data?.details?.driver?._id ||
+            clients[i]?.user._id === data?.details?.client?._id
+          ) {
+            console.log("details here", clients[i]?.user);
+            clients[i].clientSocket.emit("startRide", { start: true, data });
+            console.log("after");
+          }
+        }
+        check = true;
+      }
+    });
+    // if (!check) {
+    //   single.clientSocket.emit("startRide", { start: false });
+    // }
+  });
+  socket.on("confirmPickup", function (data) {
+    // console.log("lo1cationData", data);
+    clients.map((single) => {
+      // console.log("single", single);
+      if (single.user.position === "driver") {
+        console.log("sent");
+        single.clientSocket.emit("locationRequest", data);
+      }
+    });
+  });
+  socket.on("disconnect", function (data) {
+    for (var i = 0, len = clients.length; i < len; ++i) {
+      var c = clients[i];
+
+      if (c.clientSocket.id == socket.id) {
+        clients.splice(i, 1);
+        break;
+      }
+    }
+    console.log("client disconnected", data, clients);
   });
 });
 
