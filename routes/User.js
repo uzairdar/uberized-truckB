@@ -166,6 +166,7 @@ router.route("/createaccount").post((req, res) => {
       }
     })
     .catch((error) => {
+      console.log("Error ===>", error);
       if (error.code === 11000) {
         res.status(409).json({ message: "Email already exists", error: error });
       } else {

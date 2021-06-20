@@ -83,6 +83,64 @@ io.on("connection", (socket) => {
   });
   socket.on("currentLocation", function (data) {
     console.log("current location", data);
+
+    clients.map((single) => {
+      // console.log("single", single);
+      if (single.user._id === data.client._id) {
+        single.clientSocket.emit("driverCurrentLocation", data);
+      }
+    });
+  });
+  socket.on("onPickupLocation", function (data) {
+    console.log("on pickup data", data);
+
+    clients.map((single) => {
+      // console.log("single", single);
+      if (single.user._id === data.client._id) {
+        single.clientSocket.emit("driverPickupLocation", data);
+      }
+    });
+  });
+  socket.on("startRoute", function (data) {
+    console.log("startRoute", data);
+
+    clients.map((single) => {
+      // console.log("single", single);
+      if (single.user._id === data.client._id) {
+        single.clientSocket.emit("getStarted", data);
+      }
+    });
+  });
+  socket.on("reachedDestination", function (data) {
+    console.log("reachedDestination", data);
+
+    clients.map((single) => {
+      // console.log("single", single);
+      if (single.user._id === data.client._id) {
+        single.clientSocket.emit("DriverDestination", data);
+      }
+    });
+  });
+  socket.on("completeRide", function (data) {
+    console.log("completeRide", data);
+
+    clients.map((single) => {
+      // console.log("single", single);
+      if (single.user._id === data.client._id) {
+        single.clientSocket.emit("completeReq", data);
+      }
+    });
+  });
+  socket.on("clientPickupAccepted", function (data) {
+    console.log("clientPickupAccepted", data);
+
+    clients.map((single) => {
+      // console.log("single", single);
+      if (single.user._id === data.driver._id) {
+        console.log("found driver");
+        single.clientSocket.emit("startDestination", data);
+      }
+    });
   });
   socket.on("acceptRequest", function (data) {
     let check = false;
