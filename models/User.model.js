@@ -21,6 +21,9 @@ const userSchema = new Schema(
     isVerified: {
       type: Boolean,
     },
+    isAvailable: {
+      type: Boolean,
+    },
     mobile: {
       type: Number,
       required: true,
