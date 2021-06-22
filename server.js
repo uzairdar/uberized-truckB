@@ -28,10 +28,13 @@ const userRouter = require("./routes/User");
 const vehicleRouter = require("./routes/Vehicle");
 const adminRouter = require("./routes/Admin");
 const rideRouter = require("./routes/Rides");
+const roomRouter = require("./routes/Room");
+
 app.use("/api/vehicle", vehicleRouter);
 app.use("/api/user", userRouter);
 app.use("/api/admin", adminRouter);
 app.use("/api/ride", rideRouter);
+app.use("/api/room", roomRouter);
 const server = http.createServer(app);
 const io = require("./socket.js");
 io.connect(server);
@@ -82,7 +85,7 @@ io.on("connection", (socket) => {
     });
   });
   socket.on("currentLocation", function (data) {
-    console.log("current location", data);
+    // console.log("current location", data);
 
     clients.map((single) => {
       // console.log("single", single);
@@ -173,6 +176,14 @@ io.on("connection", (socket) => {
       if (single.user.position === "driver") {
         console.log("sent");
         single.clientSocket.emit("locationRequest", data);
+      }
+    });
+  });
+  socket.on("sendMessage", (data) => {
+    const { recieverId, message } = data;
+    clients.map((single) => {
+      if (single.user._id === recieverId) {
+        single.clientSocket.emit("messageRecieved", data);
       }
     });
   });
