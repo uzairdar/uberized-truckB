@@ -1,4 +1,5 @@
 const router = require("express").Router();
+const User = require("../models/User.model");
 let Vehicle = require("../models/Vehicles.model");
 router.route("/").get((req, res) => {
   Vehicle.find()
@@ -22,6 +23,7 @@ router.route("/add-vehicle").post((req, res) => {
     color,
     userId
   );
+  let isAvailable = true;
   const newVehicle = new Vehicle({
     service,
     brand,
@@ -38,10 +40,18 @@ router.route("/add-vehicle").post((req, res) => {
     .then((vehicle) => {
       console.log("vehicle", vehicle);
       if (vehicle) {
-        return res.json({
-          vehicle,
-          message: "Vehicle added successfully",
-        });
+        User.findByIdAndUpdate(userId, {
+          isAvailable,
+        })
+          .then((user) => {
+            return res.json({
+              vehicle,
+              message: "Vehicle added successfully",
+              user,
+            });
+            // return res.json({ user, message: "user is verified" });
+          })
+          .catch((error) => res.status(400).json({ error }));
       }
     })
     .catch((error) => {
