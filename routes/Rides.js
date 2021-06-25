@@ -9,13 +9,33 @@ router.route("/").get((req, res) => {
       return res.json({ error });
     });
 });
-router.route("/changestatus").post((req, res) => {
+router.route("/changestatus/:rid").post((req, res) => {
   const { rid } = req.params;
   const { status } = req.body;
   console.log("status", status, rid);
-  Rides.findByIdAndUpdate(rid, {
-    status,
-  })
+  Rides.findByIdAndUpdate(
+    rid,
+    {
+      status,
+    },
+    { new: true }
+  )
+    .then((ride) => {
+      return res.json({ ride, message: "ride updated succussfully" });
+    })
+    .catch((error) => res.json({ error }));
+});
+router.route("/addreview/:rid").post((req, res) => {
+  const { rid } = req.params;
+  const { review } = req.body;
+  console.log("review", review, rid);
+  Rides.findByIdAndUpdate(
+    rid,
+    {
+      review,
+    },
+    { new: true }
+  )
     .then((ride) => {
       return res.json({ ride, message: "ride updated succussfully" });
     })

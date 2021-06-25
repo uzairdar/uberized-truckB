@@ -3,7 +3,7 @@ const User = require("../models/User.model");
 let Room = require("../models/Room.model");
 router.route("/create").post(async (req, res) => {
   try {
-    console.log("\n\n\n body in create => ", req.body);
+    // console.log("\n\n\n body in create => ", req.body);
 
     const { driverId, clientId } = req.body;
     if (!driverId)

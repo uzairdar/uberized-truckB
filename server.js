@@ -56,7 +56,7 @@ io.on("connection", (socket) => {
     //   }
     // }
     let userAlreadyExists = clients.find((c, index) => {
-      console.log("index ", index);
+      // console.log("index ", index);
       if (c.user._id === data?.user._id) {
         count.push(index);
         return true;
@@ -76,7 +76,7 @@ io.on("connection", (socket) => {
   socket.on("setLocationData", function (data) {
     rides.push(data);
 
-    console.log("clients", clients);
+    // console.log("clients", clients);
     clients.map((single) => {
       // console.log("single", single);
       if (single.user.position === "driver") {
@@ -95,7 +95,7 @@ io.on("connection", (socket) => {
     });
   });
   socket.on("onPickupLocation", function (data) {
-    console.log("on pickup data", data);
+    // console.log("on pickup data", data);
 
     clients.map((single) => {
       // console.log("single", single);
@@ -105,7 +105,7 @@ io.on("connection", (socket) => {
     });
   });
   socket.on("startRoute", function (data) {
-    console.log("startRoute", data);
+    // console.log("startRoute", data);
 
     clients.map((single) => {
       // console.log("single", single);
@@ -115,7 +115,7 @@ io.on("connection", (socket) => {
     });
   });
   socket.on("reachedDestination", function (data) {
-    console.log("reachedDestination", data);
+    // console.log("reachedDestination", data);
 
     clients.map((single) => {
       // console.log("single", single);
@@ -125,7 +125,7 @@ io.on("connection", (socket) => {
     });
   });
   socket.on("completeRide", function (data) {
-    console.log("completeRide", data);
+    // console.log("completeRide", data);
 
     clients.map((single) => {
       // console.log("single", single);
@@ -147,7 +147,7 @@ io.on("connection", (socket) => {
   });
   socket.on("acceptRequest", function (data) {
     let check = false;
-    console.log("id is ", data);
+    // console.log("id is ", data);
     rides.map((single, index) => {
       // console.log("single", single);
       if (single.id === data.details.id && !single.accepted) {
@@ -157,9 +157,11 @@ io.on("connection", (socket) => {
             clients[i]?.user._id === data?.details?.driver?._id ||
             clients[i]?.user._id === data?.details?.client?._id
           ) {
-            console.log("details here", clients[i]?.user);
+            // console.log("details here", clients[i]?.user);
             clients[i].clientSocket.emit("startRide", { start: true, data });
-            console.log("after");
+            // console.log("after");
+          } else {
+            single.clientSocket.emit("startRide", { start: false });
           }
         }
         check = true;
@@ -174,7 +176,7 @@ io.on("connection", (socket) => {
     clients.map((single) => {
       // console.log("single", single);
       if (single.user.position === "driver") {
-        console.log("sent");
+        // console.log("sent");
         single.clientSocket.emit("locationRequest", data);
       }
     });
