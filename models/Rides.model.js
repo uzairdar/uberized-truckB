@@ -29,6 +29,9 @@ const ridesSchema = new Schema(
     status: {
       type: String,
     },
+    review: {
+      type: Object,
+    },
   },
   {
     timestamps: true,
