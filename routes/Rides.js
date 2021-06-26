@@ -9,6 +9,22 @@ router.route("/").get((req, res) => {
       return res.json({ error });
     });
 });
+router.route("/single/:uid").get((req, res) => {
+  const uid = req.params.uid;
+  Rides.find()
+    .or([{ "client._id": uid }, { "driver._id": uid }])
+    .then((rides) => {
+      // console.log("order", order, sellerId);
+      if (rides) {
+        return res.json({ rides, message: "Rides found" });
+      } else {
+        return res.json({ message: "No Rides found" });
+      }
+    })
+    .catch((error) => {
+      return res.json({ error });
+    });
+});
 router.route("/remove/:rid").delete((req, res) => {
   const { rid } = req.params;
   Rides.findByIdAndDelete(rid)
