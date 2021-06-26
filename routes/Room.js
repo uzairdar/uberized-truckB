@@ -1,6 +1,16 @@
 const router = require("express").Router();
 const User = require("../models/User.model");
 let Room = require("../models/Room.model");
+
+router.route("/").get((req, res) => {
+  Room.find()
+    .then((room) => {
+      return res.json({ room });
+    })
+    .catch((error) => {
+      return res.json({ error });
+    });
+});
 router.route("/create").post(async (req, res) => {
   try {
     // console.log("\n\n\n body in create => ", req.body);
