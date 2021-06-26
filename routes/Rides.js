@@ -9,6 +9,17 @@ router.route("/").get((req, res) => {
       return res.json({ error });
     });
 });
+router.route("/remove/:rid").delete((req, res) => {
+  const { rid } = req.params;
+  Rides.findByIdAndDelete(rid)
+    .then((ride) => {
+      if (ride) return res.json({ ride, message: "Ride deleted successfully" });
+      else return res.json({ message: "Ride not found by this id" });
+    })
+    .catch((error) => {
+      return res.json({ error });
+    });
+});
 router.route("/changestatus/:rid").post((req, res) => {
   const { rid } = req.params;
   const { status } = req.body;

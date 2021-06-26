@@ -19,6 +19,16 @@ router.route("/").get((req, res) => {
       return res.json({ error });
     });
 });
+router.route("/single/:uid").get((req, res) => {
+  const { uid } = req.params;
+  User.findById(uid)
+    .then((user) => {
+      return res.json({ user });
+    })
+    .catch((error) => {
+      return res.json({ error });
+    });
+});
 router.route("/check-email/:email").post((req, res) => {
   const { email } = req.params;
   var random = Math.floor(Math.random() * (9999 - 1000) + 1000);
